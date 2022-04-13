@@ -75,8 +75,31 @@ router.post('/', (req,res)=>{
 //  if missing 400
 //  if bad 500
 //  if valid, update using request body, 200, return new post
-router.get('/', (req,res)=>{
-
+router.put('/:id', (req,res)=>{
+    let id = req.params.id;
+    let post = req.body;
+    if (!post.title || !post.contents) {
+        res.status(400).json({
+            message: err400,
+        })
+    } else {
+        Posts.update(id, post)
+            .then(updatedPost => {
+                if (!updatedPost) {
+                    res.status(404).json({
+                        message: err404,
+                    })
+                } else {
+                    res.status(200).json(updatedPost)
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    message: err500,
+                    error: err.message,
+                })
+            })
+    }
 });
 
 // DELETE /api/posts/:id
