@@ -50,8 +50,24 @@ router.get('/:id', (req,res)=>{
 //  if missing title or contents (400)
 //  if valid, post, 201, return post
 //  if bad 500
-router.get('/', (req,res)=>{
-
+router.post('/', (req,res)=>{
+    let post = req.body;
+    if (!post.title || !post.contents) {
+        res.status(400).json({
+            message: err400,
+        })
+    } else {
+        Posts.insert(post)
+            .then(newPost => {
+                res.status(201).json(newPost)
+            })
+            .catch(err=>{
+                res.status(500).json({
+                    message: err500,
+                    error: err.message,
+                })
+            })
+    }
 });
 
 // PUT /api/posts/:id
