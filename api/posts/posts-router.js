@@ -105,8 +105,23 @@ router.put('/:id', (req,res)=>{
 // DELETE /api/posts/:id
 //  if not found, 404
 //  if bad, 500
-router.get('/', (req,res)=>{
-
+router.delete('/:id', (req,res)=>{
+    Posts.remove(req.params.id)
+        .then(deletedPost=>{
+            if (!deletedPost) {
+                res.status(404).json({
+                    message: err404,
+                })
+            } else {
+                res.json(deletedPost)
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: err500,
+                error: err.message,
+            })
+        })
 });
 
 // GET /api/posts/:id/comments
