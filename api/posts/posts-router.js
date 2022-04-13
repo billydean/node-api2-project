@@ -5,9 +5,6 @@ const Posts = require('./posts-model')
 const router = express.Router();
 
 //error messages
-const err500 = "The posts information could not be retrieved";
-const err404 = "The post with the specified ID does not exist";
-const err400 = "Please provide title and contents for the post";
 
 // GET /api/posts
     // if error, 500, "The posts information could not be retrieved"
@@ -18,7 +15,7 @@ router.get('/', (req,res)=>{
         })
         .catch(err => {
             res.status(500).json({
-                message: err500,
+                message: "The posts information could not be retrieved",
                 error: err.message,
             })
         })
@@ -33,14 +30,14 @@ router.get('/:id', (req,res)=>{
         .then(post => {
             if (!post) {
                 res.status(404).json({
-                    message: err404,
+                    message: "The post with the specified ID does not exist",
                 })
             }
             res.json(post);
         })
         .catch(err => {
             res.status(500).json({
-                message: err500,
+                message: "The post information could not be retrieved",
                 error: err.message
             })
         })
@@ -54,7 +51,7 @@ router.post('/', (req,res)=>{
     let post = req.body;
     if (!post.title || !post.contents) {
         res.status(400).json({
-            message: err400,
+            message: "Please provide title and contents for the post",
         })
     } else {
         Posts.insert(post)
@@ -63,7 +60,7 @@ router.post('/', (req,res)=>{
             })
             .catch(err=>{
                 res.status(500).json({
-                    message: err500,
+                    message: "There was an error while saving the post to the database",
                     error: err.message,
                 })
             })
@@ -80,14 +77,14 @@ router.put('/:id', (req,res)=>{
     let post = req.body;
     if (!post.title || !post.contents) {
         res.status(400).json({
-            message: err400,
+            message: "Please provide title and contents for the post",
         })
     } else {
         Posts.update(id, post)
             .then(updatedPost => {
                 if (!updatedPost) {
                     res.status(404).json({
-                        message: err404,
+                        message: "The post with the specified ID does not exist",
                     })
                 } else {
                     res.status(200).json(updatedPost)
@@ -95,7 +92,7 @@ router.put('/:id', (req,res)=>{
             })
             .catch(err => {
                 res.status(500).json({
-                    message: err500,
+                    message: "The post information could not be modified",
                     error: err.message,
                 })
             })
@@ -110,7 +107,7 @@ router.delete('/:id', (req,res)=>{
         .then(deletedPost=>{
             if (!deletedPost) {
                 res.status(404).json({
-                    message: err404,
+                    message: "The post with the specified ID does not exist",
                 })
             } else {
                 res.json(deletedPost)
@@ -118,7 +115,7 @@ router.delete('/:id', (req,res)=>{
         })
         .catch(err => {
             res.status(500).json({
-                message: err500,
+                message: "The post could not be removed",
                 error: err.message,
             })
         })
@@ -127,8 +124,23 @@ router.delete('/:id', (req,res)=>{
 // GET /api/posts/:id/comments
 // 404 if none
 // 500 if bad
-router.get('/', (req,res)=>{
-
+router.get('/:id/comments', (req,res)=>{
+    Posts.findPostComments(req.params.id)
+        .then(post => {
+            if (!post) {
+                res.status(404).json({
+                    message: "The post with the specified ID does not exist",
+                })
+            }
+            res.json(post);
+        })
+        .catch(err=>{
+            res.status(500).json({
+                message: "The comments information could not be retrieved" ,
+                error: err.message,
+            })
+        })
 });
+
 
 module.exports = router ;
